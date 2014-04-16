@@ -1,3 +1,5 @@
+package soal.util
+
 import java.util.NoSuchElementException
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable
@@ -8,6 +10,7 @@ import scala.collection.mutable
   */
 trait MappedPriorityQueue[A] {
   def insert(a: A, priority: Float): Unit
+  def contains(a: A): Boolean
   def increasePriority(a: A, newPriority: Float): Unit
   def getPriority(a: A): Float  // Returns 0.0 if a is not in the queue
   def maxPriority: Float
@@ -104,4 +107,6 @@ class HeapMappedPriorityQueue[A] extends MappedPriorityQueue[A] {
       i = parent(i)
     }
   }
+
+  override def contains(a: A): Boolean = itemToIndex.contains(a)
 }
