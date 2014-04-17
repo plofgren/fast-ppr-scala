@@ -1,20 +1,34 @@
+/*
+Copyright 2014 Stanford Social Algorithms Lab
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
 package soal.fastppr
 
 case class FastPPRConfiguration(
                                  teleportProbability: Float,
-                                 /**  In forward work, we will do nWalksConstant / epsilon_f walks. */
+                                 /**  In forward work, we will do nWalksConstant / forwardPPRSignificanceThreshold walks. */
                                  nWalksConstant : Float,
-                                  /** In reverse PPR computation, our additive bound is reversePPRApproximationFactor  * reversePPRSignificanceThreshold. (beta in paper) */
+                                  /** In reverse PPR computation, our additive bound is reversePPRApproximationFactor  * reversePPRSignificanceThreshold.
+                                    * (beta in paper) */
                                  reversePPRApproximationFactor: Float,
-                                 /** PPR values above this threshold will be detected by Fast-PPR (delta in paper)*/
+                                 /** PPR values above this threshold will be detected by Fast-PPR.
+                                   * (delta in paper)*/
                                  pprSignificanceThreshold: Float
-                                 ///** The minimum ppr value we reliably detect is pprSignificanceThresholdTimesN / nodeCount */
-                                 //pprSignificanceThresholdTimesN: Float
+
                                  )         {
   def walkCount(forwardPPRSignificanceThreshold: Float): Int = (nWalksConstant / forwardPPRSignificanceThreshold).toInt
-  
-  
-  //def pprSignificanceThreshold(nodeCount: Int): Float = pprSignificanceThresholdTimesN / nodeCount
 }
 
 object FastPPRConfiguration {
