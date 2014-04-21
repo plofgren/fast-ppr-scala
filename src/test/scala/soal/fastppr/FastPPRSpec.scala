@@ -38,7 +38,7 @@ class FastPPRSpec extends FlatSpec with Matchers {
 
   "FastPPR.estimatePPR" should "be approximately correct on the test graph" in {
     var config = FastPPRConfiguration.defaultConfiguration
-    config = config.copy(pprSignificanceThreshold = 0.03f) // smallested true PPR on test graph is 0.03
+    config = config.copy(pprSignificanceThreshold = 0.03f) // smallest true PPR on test graph is 0.03
     val approximationRatio = 1.4f
     for (line <- Source.fromFile("src/test/resources/test_graph_true_pprs.txt").getLines()) {
       val pieces = line.split("\t")
