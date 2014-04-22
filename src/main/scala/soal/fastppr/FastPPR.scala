@@ -20,6 +20,7 @@ import com.twitter.cassovary.graph.DirectedGraph
 import scala.collection.mutable
 import soal.util.HeapMappedPriorityQueue
 import scala.util.Random
+import grizzled.slf4j.Logging
 
 object FastPPR {
 

@@ -8,7 +8,10 @@ import scala.collection.mutable
 import scala.util.Random
 import soal.fastppr.{FastPPRConfiguration, FastPPR}
 
-object AccuracyExperiments {
+import grizzled.slf4j.Logging
+
+
+object AccuracyExperiments extends Logging {
   def main(args: Array[String]) {
     assert(args.length == 1)
     val filenameStart = args(0).lastIndexOf('/') + 1
@@ -29,30 +32,25 @@ object AccuracyExperiments {
 
   def measureRelativeError(graph: DirectedGraph, targetCount: Int, startCountPerTarget: Int): Seq[Float] = {
     val nodes: Seq[Node] = graph.toSeq
-    val threshold = 1.0f / graph.nodeCount
+    val threshold = 4.0f / graph.nodeCount
     var config = FastPPRConfiguration.defaultConfiguration
-    config=config.copy(pprSignificanceThreshold = threshold)
+    config = config.copy(pprSignificanceThreshold = threshold)
 
     val truePPRs = mutable.ArrayBuffer[Float]()
     val estimatedPPRs = mutable.ArrayBuffer[Float]()
     for (targetIndex <- 0 until targetCount) {
       val target = nodes(Random.nextInt(nodes.size))
       val trueInversePPRs = FastPPR.estimateInversePPR(graph, target.id, config, threshold / 100.0f)
-      val candidateStarts = trueInversePPRs.keys filter {
-        trueInversePPRs(_) > threshold
-      } toSeq;
+      // We only claim accuracy when truePPR >~ threshold
+      val candidateStarts = (trueInversePPRs.keys filter {
+        nodeId => threshold / 4.0f <= trueInversePPRs(nodeId) && trueInversePPRs(nodeId) <= threshold * 4
+      }).toSeq
 
       if (candidateStarts.size >= startCountPerTarget) {
         for (startIndex <- 0 until startCountPerTarget) {
           val startId: Int = candidateStarts(Random.nextInt(candidateStarts.size))
           val truePPR = trueInversePPRs(startId)
           val estimatedPPR = FastPPR.estimatePPR(graph, startId, target.id, config, balanced = false)
-          // We only claim accuracy when truePPR > threshold
-          if (truePPR > threshold) {
-            truePPRs.append(truePPR)
-            estimatedPPRs.append(estimatedPPR)
-          }
-
           printf("%d\t%d\t%g\t%g\n", startId, target.id, estimatedPPR, truePPR)
         }
       } else {
@@ -60,8 +58,8 @@ object AccuracyExperiments {
       }
     }
 
-    println "estimatedPPRs = " + estimatedPPRs.mkString("[", ",", "]")
-    println "truePPRs = " + truePPRs.mkString("[", ",", "]")
+    println("estimatedPPRs = " + estimatedPPRs.mkString("[", ",", "]"))
+    println("truePPRs = " + truePPRs.mkString("[", ",", "]"))
 
     val relErrors = (truePPRs zip estimatedPPRs) map {
       case (truePPR, estimatedPPR) => math.abs(truePPR - estimatedPPR) / truePPR
