@@ -59,6 +59,10 @@ object AccuracyExperiments {
         println("Not enough start nodes for target " + target.id)
       }
     }
+
+    println "estimatedPPRs = " + estimatedPPRs.mkString("[", ",", "]")
+    println "truePPRs = " + truePPRs.mkString("[", ",", "]")
+
     val relErrors = (truePPRs zip estimatedPPRs) map {
       case (truePPR, estimatedPPR) => math.abs(truePPR - estimatedPPR) / truePPR
     }
