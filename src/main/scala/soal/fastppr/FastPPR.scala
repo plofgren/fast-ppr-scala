@@ -178,11 +178,11 @@ object FastPPR {
    */
 
   def debias(
-                graph: DirectedGraph,
-                config: FastPPRConfiguration,
-                inversePPREstimates: mutable.Map[Int, Float],
-                reversePPRSignificanceThreshold: Float,
-                pprErrorTolerance: Float) {
+              graph: DirectedGraph,
+              config: FastPPRConfiguration,
+              inversePPREstimates: mutable.Map[Int, Float],
+              reversePPRSignificanceThreshold: Float,
+              pprErrorTolerance: Float) {
     for (vId <- inversePPREstimates.keysIterator
          if inversePPREstimates(vId) > reversePPRSignificanceThreshold) {
       inversePPREstimates(vId) += pprErrorTolerance / 2.0f
@@ -193,6 +193,7 @@ object FastPPR {
       }
     }
   }
+
 
   /** Returns the set of nodes with some out-neighbor in the target set (those nodes v with
     * ppr(v, target) > reversePPRSignificanceThreshold)
