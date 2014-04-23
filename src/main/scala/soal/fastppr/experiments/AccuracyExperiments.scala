@@ -12,23 +12,6 @@ import grizzled.slf4j.Logging
 
 
 object AccuracyExperiments extends Logging {
-  def main(args: Array[String]) {
-    assert(args.length == 1)
-    val filenameStart = args(0).lastIndexOf('/') + 1
-    val graphDirectory = args(0).take(filenameStart)
-    val graphFilename = args(0).drop(filenameStart)
-
-    val reader = new AdjacencyListGraphReader(graphDirectory, graphFilename) {
-      override def storedGraphDir: StoredGraphDir = StoredGraphDir.BothInOut
-    }
-    val graph = reader.toArrayBasedDirectedGraph()
-    println(graph.nodeCount)
-    val relErrors = measureRelativeError(graph, 10, 10)
-    println("relErrors: " + relErrors)
-    println("average relError: " + relErrors.sum / relErrors.size)
-    println("max relError: " + relErrors.max)
-
-  }
 
   def measureRelativeError(graph: DirectedGraph, targetCount: Int, startCountPerTarget: Int): Seq[Float] = {
     val nodes: Seq[Node] = graph.toSeq
@@ -51,6 +34,8 @@ object AccuracyExperiments extends Logging {
           val startId: Int = candidateStarts(Random.nextInt(candidateStarts.size))
           val truePPR = trueInversePPRs(startId)
           val estimatedPPR = FastPPR.estimatePPR(graph, startId, target.id, config, balanced = false)
+          truePPRs.append(truePPR)
+          estimatedPPRs.append(estimatedPPR)
           printf("%d\t%d\t%g\t%g\n", startId, target.id, estimatedPPR, truePPR)
         }
       } else {
@@ -64,6 +49,9 @@ object AccuracyExperiments extends Logging {
     val relErrors = (truePPRs zip estimatedPPRs) map {
       case (truePPR, estimatedPPR) => math.abs(truePPR - estimatedPPR) / truePPR
     }
+    println("relErrors = " + relErrors)
+    println("averageRelError = " + relErrors.sum / relErrors.size)
+    println("maxRelError = " + relErrors.max)
     relErrors
   }
 }

@@ -56,7 +56,7 @@ object FastPPR {
   /**
    * Returns an estimate of the PPR from start to the frontier, using weights in inversePPREstimates.
    */
-  private def pprToFrontier(graph: DirectedGraph,
+  private[fastppr] def pprToFrontier(graph: DirectedGraph,
                     startId: Int,
                     forwardPPRSignificanceThreshold: Float,
                     config: FastPPRConfiguration,
