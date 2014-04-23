@@ -177,22 +177,22 @@ object FastPPR {
    */
 
   def debias(
-                graph: DirectedGraph,
-                config: FastPPRConfiguration,
-                inversePPREstimates: mutable.Map[Int, Float],
-                reversePPRSignificanceThreshold: Float,
-                pprErrorTolerance: Float) {
-    for (vId <- inversePPREstimates.keysIterator) {
-      if (vId > reversePPRSignificanceThreshold) {
-        inversePPREstimates(vId) += pprErrorTolerance / 2.0f
-        val v = graph.getNodeById(vId).get
-        for (uId <- v.inboundNodes()) {
-          val u =  graph.getNodeById(uId).get
-          inversePPREstimates(uId) +=  (1.0f - config.teleportProbability) / u.outboundCount * pprErrorTolerance / 2.0f
-        }
+              graph: DirectedGraph,
+              config: FastPPRConfiguration,
+              inversePPREstimates: mutable.Map[Int, Float],
+              reversePPRSignificanceThreshold: Float,
+              pprErrorTolerance: Float) {
+    for (vId <- inversePPREstimates.keysIterator
+         if inversePPREstimates(vId) > reversePPRSignificanceThreshold) {
+      inversePPREstimates(vId) += pprErrorTolerance / 2.0f
+      val v = graph.getNodeById(vId).get
+      for (uId <- v.inboundNodes()) {
+        val u = graph.getNodeById(uId).get
+        inversePPREstimates(uId) += (1.0f - config.teleportProbability) / u.outboundCount * pprErrorTolerance / 2.0f
       }
     }
   }
+
 
   /** Returns the set of nodes with some out-neighbor in the target set (those nodes v with
     * ppr(v, target) > reversePPRSignificanceThreshold)
