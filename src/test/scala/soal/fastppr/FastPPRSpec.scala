@@ -15,22 +15,24 @@ class FastPPRSpec extends FlatSpec with Matchers {
 
   "FastPPR.frontier" should "be correct on the test graph" in {
     val config = FastPPRConfiguration.defaultConfiguration
+    val pprErrorTolerance = 2.0e-6f
     for (line <- Source.fromFile("src/test/resources/test_graph_true_pprs.txt").getLines()) {
       val pieces = line.split("\t")
       val (startId, targetId, truePPR) = (pieces(0).toInt, pieces(1).toInt, pieces(2).toFloat)
-      val inversePPRs = FastPPR.estimateInversePPR(graph, targetId, config, 1.0e-6f)
-      withClue ("(%d, %d)".format(startId, targetId)) {inversePPRs(startId) should equal (truePPR +- 1.0e-6f)}
+      val inversePPRs = FastPPR.estimateInversePPR(graph, targetId, config, pprErrorTolerance)
+      withClue ("(%d, %d)".format(startId, targetId)) {inversePPRs(startId) should equal (truePPR +- pprErrorTolerance)}
     }
   }
 
   "FastPPR.frontierBalanced" should "be correct on the test graph" in {
     var config = FastPPRConfiguration.defaultConfiguration
     config = config.copy(pprSignificanceThreshold = 1.0e-16f) // Choose tiny significance value to test correctness
+    val pprErrorTolerance = 2.0e-6f
     for (line <- Source.fromFile("src/test/resources/test_graph_true_pprs.txt").getLines()) {
       val pieces = line.split("\t")
       val (startId, targetId, truePPR) = (pieces(0).toInt, pieces(1).toInt, pieces(2).toFloat)
       val (inversePPRs, epsilonR) = FastPPR.estimateInversePPRBalanced(graph, targetId, config)
-      withClue ("(%d, %d)".format(startId, targetId)) {inversePPRs(startId) should equal (truePPR +- 1.0e-6f)}
+      withClue ("(%d, %d)".format(startId, targetId)) {inversePPRs(startId) should equal (truePPR +- pprErrorTolerance)}
     }
   }
 
