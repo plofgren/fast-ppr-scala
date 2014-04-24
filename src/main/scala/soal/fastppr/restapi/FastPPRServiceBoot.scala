@@ -4,6 +4,7 @@ import akka.actor.{Props, ActorSystem}
 import spray.servlet.WebBoot
 import akka.io.IO
 import spray.can.Http
+import com.typesafe.config.{Config, ConfigFactory}
 
 // this class is instantiated by the servlet initializer
 // it needs to have a default constructor and implement
@@ -21,11 +22,11 @@ class FastPPRServiceBoot extends WebBoot {
 }
 
 object FastPPRServiceBoot extends App {
-  implicit val system = ActorSystem("FastPPRService")
-  val log = system.log
-  val service = system.actorOf(Props[FastPPRServiceActor]{
-    new FastPPRServiceActor("Pokec!")
-  })
+  val fastPPRServiceBoot = new FastPPRServiceBoot()
+  val system = fastPPRServiceBoot.system
+  val service = fastPPRServiceBoot.serviceActor
+  val conf = ConfigFactory.load()
+  val port = conf.getInt("fastppr.restapi.port")
 
-  IO(Http) ! Http.Bind(service, interface = "localhost", port = 8081)
+  IO(Http)(system) ! Http.Bind(service, interface = "localhost", port = port)
 }
