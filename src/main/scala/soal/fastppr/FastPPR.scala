@@ -141,7 +141,8 @@ object FastPPR {
       }
     }
 
-    while( !inversePPRResiduals.isEmpty && predictedForwardSteps(inversePPRResiduals.maxPriority) >= reverseSteps) {
+    while( !inversePPRResiduals.isEmpty &&
+        predictedForwardSteps(inversePPRResiduals.maxPriority) * config.forwardStepsPerReverseStep >= reverseSteps) {
       val vPriority = inversePPRResiduals.maxPriority
       val vId = inversePPRResiduals.extractMax()
       val v = graph.getNodeById(vId).get

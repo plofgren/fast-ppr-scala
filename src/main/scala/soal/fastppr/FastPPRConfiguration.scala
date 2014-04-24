@@ -20,13 +20,17 @@ case class FastPPRConfiguration(
                                  teleportProbability: Float,
                                  /**  In forward work, we will do nWalksConstant / forwardPPRSignificanceThreshold walks. */
                                  nWalksConstant : Float,
-                                  /** In reverse PPR computation, our additive bound is reversePPRApproximationFactor  * reversePPRSignificanceThreshold.
+                                  /** In reverse PPR computation, our additive bound is
+                                    * reversePPRApproximationFactor  * reversePPRSignificanceThreshold.
                                     * (beta in paper) */
                                  reversePPRApproximationFactor: Float,
                                  /** PPR values above this threshold will be detected by Fast-PPR.
                                    * (delta in paper)*/
-                                 pprSignificanceThreshold: Float
-
+                                 pprSignificanceThreshold: Float,
+                                  /** The number of average forward steps (random edge visit) we can do
+                                    * in the time it takes to do one average reverse step (priority queue update).
+                                    * TODO(some automating tuning option)*/
+                                 forwardStepsPerReverseStep: Float
                                  )         {
   def walkCount(forwardPPRSignificanceThreshold: Float): Int = (nWalksConstant / forwardPPRSignificanceThreshold).toInt
 }
@@ -36,5 +40,6 @@ object FastPPRConfiguration {
     teleportProbability=0.2f,
     nWalksConstant=24 *  math.log(1.0e6).toFloat,
     reversePPRApproximationFactor=1.0f  / 6.0f,
-    pprSignificanceThreshold=1.0e-6f)
+    pprSignificanceThreshold=1.0e-6f,
+    forwardStepsPerReverseStep=6.7f)
 }
