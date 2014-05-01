@@ -30,7 +30,11 @@ object RuntimeExperiments {
     println("totalTimes = " + totalTimes.mkString("[", ", ", "]"))
     println("meanReverseTime = " + ExperimentUtils.mean(reverseTimes))
     println("meanForwardTime = " + ExperimentUtils.mean(forwardTimes))
-
+    if (balanced) {
+      println("Current forwardStepsPerReverseStep value = " + config.forwardStepsPerReverseStep)
+      println("Suggested new forwardStepsPerReverseStep value = " +
+        config.forwardStepsPerReverseStep * math.sqrt(reverseTimes.sum / forwardTimes.sum))
+    }
 
     totalTimes
   }

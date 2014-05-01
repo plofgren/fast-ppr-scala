@@ -49,9 +49,11 @@ object AccuracyExperiments extends Logging {
     val relErrors = (truePPRs zip estimatedPPRs) map {
       case (truePPR, estimatedPPR) => math.abs(truePPR - estimatedPPR) / truePPR
     }
+
     println("relErrors = " + relErrors)
     println("averageRelError = " + relErrors.sum / relErrors.size)
     println("maxRelError = " + relErrors.max)
+
     relErrors
   }
 }

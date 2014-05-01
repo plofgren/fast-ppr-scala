@@ -79,14 +79,37 @@ object FastPPR {
     estimate.toFloat
   }
 
+  def monteCarloPPR(graph: DirectedGraph,
+                    startId: Int,
+                    walkCount: Int,
+                    teleportProbability: Float): mutable.Map[Int, Float] = {
+
+    var pprEstimates =  mutable.HashMap[Int, Float]().withDefaultValue(0.0f)
+    for (walkIndex <- 0 until walkCount) {
+      var currentNode = graph.getNodeById(startId).get
+      var hitDeadEnd = false
+      while (Random.nextFloat() > teleportProbability && !hitDeadEnd) {
+        if (currentNode.outboundCount > 0) {
+          currentNode = graph.getNodeById(currentNode.randomOutboundNode.get).get
+        } else {
+          hitDeadEnd = true
+        }
+      }
+      if (!hitDeadEnd) {
+        pprEstimates(currentNode.id) += 1.0f / walkCount
+      }
+    }
+    pprEstimates
+  }
+
   /** Returns a map from nodeId to ppr(node, target) up to a fixed additive accuracy pprErrorTolerance. */
   def estimateInversePPR(
                 graph: DirectedGraph,
                 targetId: Int,
                 config: FastPPRConfiguration,
                 pprErrorTolerance: Float): mutable.Map[Int, Float] = {
-    val largeResidualNodes = mutable.Queue[Int]()
-    largeResidualNodes.enqueue(targetId)
+    val largeResidualNodes = new java.util.ArrayDeque[Int]()//mutable.Queue[Int]()
+    largeResidualNodes.add(targetId)
 
     // inversePPREstimates(uId) estimates ppr(u, target)
     val inversePPREstimates = mutable.HashMap[Int, Float]().withDefaultValue(0.0f)
@@ -97,7 +120,7 @@ object FastPPR {
     val largeResidualThreshold = pprErrorTolerance * config.teleportProbability // inversePPRResiduals about this must be enqueued and pushed
 
     while (!largeResidualNodes.isEmpty) {
-      val vId = largeResidualNodes.dequeue()
+      val vId = largeResidualNodes.pollFirst()
       val vResidual = inversePPRResiduals(vId)
       inversePPRResiduals(vId) = 0.0f
       val v = graph.getNodeById(vId).get
@@ -107,7 +130,7 @@ object FastPPR {
         inversePPRResiduals(uId) += deltaPriority
         inversePPREstimates(uId) += deltaPriority
         if (inversePPRResiduals(uId) >= largeResidualThreshold && inversePPRResiduals(uId) - deltaPriority < largeResidualThreshold)
-          largeResidualNodes.enqueue(uId)
+          largeResidualNodes.add(uId)
 
       }
     }
@@ -143,7 +166,7 @@ object FastPPR {
     }
 
     while( !inversePPRResiduals.isEmpty &&
-        predictedForwardSteps(inversePPRResiduals.maxPriority) * config.forwardStepsPerReverseStep >= reverseSteps) {
+        predictedForwardSteps(inversePPRResiduals.maxPriority) / config.forwardStepsPerReverseStep >= reverseSteps) {
       val vPriority = inversePPRResiduals.maxPriority
       val vId = inversePPRResiduals.extractMax()
       val v = graph.getNodeById(vId).get

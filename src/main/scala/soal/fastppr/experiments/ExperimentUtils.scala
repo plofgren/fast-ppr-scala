@@ -8,11 +8,10 @@ import scala.util.Random
 import soal.fastppr.FastPPRConfiguration
 
 object ExperimentUtils {
-  def readGraph(args: Array[String]): DirectedGraph = {
-    assert(args.length == 1)
-    val filenameStart = args(0).lastIndexOf('/') + 1
-    val graphDirectory = args(0).take(filenameStart)
-    val graphFilename = args(0).drop(filenameStart)
+  def readGraph(graphPath: String): DirectedGraph = {
+    val filenameStart = graphPath.lastIndexOf('/') + 1
+    val graphDirectory = graphPath.take(filenameStart)
+    val graphFilename = graphPath.drop(filenameStart)
     println("graph:" + graphFilename)
 
     val reader = new AdjacencyListGraphReader(graphDirectory, graphFilename) {
