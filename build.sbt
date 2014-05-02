@@ -11,6 +11,8 @@ libraryDependencies += "org.scalatest" % "scalatest_2.10" % "2.0" % "test"
 
 libraryDependencies += "org.clapper" % "grizzled-slf4j_2.10" % "1.0.1"
 
+libraryDependencies += "net.minidev" % "json-smart" % "1.0.9"
+
 //mainClass in (Compile, run) := Some("soal.fastppr.experiments.AccuracyExperiments")
 
 

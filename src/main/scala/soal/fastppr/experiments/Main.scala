@@ -12,6 +12,12 @@ object Main {
         val idRemappingPath = args(2)
         RankingPreliminaryExperiment.topTargetsForUsers(graph, idRemappingPath)
       }
+      case "csv_experiment" => {
+        assert(args.size == 4)
+        val csvFilePathPrefix = args(2)
+        val nodeCount = args(3).toInt
+        CSVExportExperiment.createCSVFiles(graph, csvFilePathPrefix, nodeCount)
+      }
       case otherString => println("Unrecognized experiment " + otherString)
     }
 
