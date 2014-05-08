@@ -86,6 +86,7 @@ object FastPPR {
 
     var pprEstimates =  mutable.HashMap[Int, Float]().withDefaultValue(0.0f)
     for (walkIndex <- 0 until walkCount) {
+      if (walkCount > 0 && walkIndex % 1000000 == 0) System.err.println("Completed " + walkIndex + " walks...")
       var currentNode = graph.getNodeById(startId).get
       var hitDeadEnd = false
       while (Random.nextFloat() > teleportProbability && !hitDeadEnd) {

@@ -8,9 +8,16 @@ object Main {
       case "runtime_balanced" => RuntimeExperiments.measureRuntime(graph, 100, true)
       case "accuracy" => AccuracyExperiments.measureRelativeError(graph, 10, 100)
       case "ppr_ranking" =>  {
-        assert(args.size == 3)
+        assert(args.size == 5)
         val idRemappingPath = args(2)
-        RankingPreliminaryExperiment.topTargetsForUsers(graph, idRemappingPath)
+        val startTwitterId = args(3).toInt
+        val walkCount = args(4).toInt
+        RankingPreliminaryExperiment.topTargetsForUsers(graph, idRemappingPath, startTwitterId, walkCount)
+      }
+      case "ranking_csv_expand" => {
+        assert(args.size == 2)
+        val rankingPath = args(1)
+        RankingPreliminaryExperiment.csvToExpandedHTML(rankingPath)
       }
       case "csv_experiment" => {
         assert(args.size == 4)
