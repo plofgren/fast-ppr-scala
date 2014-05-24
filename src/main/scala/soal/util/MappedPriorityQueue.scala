@@ -125,4 +125,12 @@ class HeapMappedPriorityQueue[A] extends MappedPriorityQueue[A] {
   }
 
   override def contains(a: A): Boolean = itemToIndex.contains(a)
+
+  def size: Int = itemToIndex.size
+
+  override def toString: String = {
+    val itemPriorityPairs = (itemToIndex.keys map { x => (x.toString, getPriority(x))}).toSeq
+    val sortedPairs = itemPriorityPairs.sortBy { -_._2 }
+    sortedPairs.mkString("[", ",", "]")
+  }
 }

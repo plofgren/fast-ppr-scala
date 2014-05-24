@@ -1,5 +1,7 @@
 package soal.fastppr.experiments
 
+import com.twitter.cassovary.graph.DirectedGraph
+
 object Main {
   def main(args: Array[String]) {
     lazy val graph = ExperimentUtils.readGraph(args(1)) // Lazy evaluation to save time if other parameters are invalid
@@ -25,6 +27,13 @@ object Main {
         val nodeCount = args(3).toInt
         CSVExportExperiment.createCSVFiles(graph, csvFilePathPrefix, nodeCount)
       }
+      case "ff_size" => {
+        assert(args.size == 4)
+        val maxResidual = args(2).toFloat
+        val nodeCount = args(3).toInt
+        ForwardFrontierExperiment.forwardFrontierSizes(graph, maxResidual, nodeCount)
+      }
+
       case otherString => println("Unrecognized experiment " + otherString)
     }
 
