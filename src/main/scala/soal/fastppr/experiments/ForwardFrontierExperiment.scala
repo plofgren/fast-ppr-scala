@@ -1,7 +1,7 @@
 package soal.fastppr.experiments
 
 import com.twitter.cassovary.graph.{Node, DirectedGraph}
-import soal.fastppr.FastPPRConfiguration
+import soal.fastppr.{FastPPR, FastPPRConfiguration}
 import scala.collection.mutable
 import soal.util.HeapMappedPriorityQueue
 
@@ -19,6 +19,29 @@ object ForwardFrontierExperiment {
     }
     println(frontierSizes.mkString("[", ",", "]"))
   }
+
+  def forwardFrontierSizesVaryingResidual(graph: DirectedGraph, nodeCount: Int) {
+    val maxOutdegree = 1000
+    val teleportProbability = FastPPRConfiguration.defaultConfiguration.teleportProbability
+    val nodeIds = (0 until graph.maxNodeId) // Assume ids are sequential
+
+    val startNodeIds = 0 until nodeCount  map { x => ExperimentUtils.randomElement(nodeIds) }
+
+    val maxResiduals = for (maxResidualExponent <- 3 to 11) yield math.pow(2.0, -maxResidualExponent).toFloat
+
+    val meanSizes = for (maxResidual <- maxResiduals) yield {
+      println("\n\n----------maxResidual " + maxResidual + " -------------")
+      def frontierSizes = for (s <- startNodeIds) yield {
+        val size = computeFrontierSize(graph, s, maxResidual, teleportProbability, maxOutdegree)
+        println("node " + s + " has forward frontier size " + size)
+        size
+      }
+      frontierSizes.sum / frontierSizes.size
+    }
+
+    println(maxResiduals.mkString("[", ",", "]") + ", " + meanSizes.mkString("[", ",", "]"))
+  }
+
 
   def computeFrontierSize(graph: DirectedGraph, startId: Int, maxResidual: Float, teleportProbability: Float, maxOutdegree: Int): Int = {
     val pprResiduals = new HeapMappedPriorityQueue[Int]()
@@ -39,9 +62,11 @@ object ForwardFrontierExperiment {
           }
           pprResiduals.increasePriority(uId, pprResiduals.getPriority(uId) + deltaPriority)
         }
+      } else {
+        println("Ignoring node " + vId + " with outdegree " + v.outboundCount + " and residual " + vResidual)
       }
     }
-    println("\t" + pprResiduals)
+    //println("\t" + pprResiduals)
     pprResiduals.size
   }
 }

@@ -219,7 +219,7 @@ object FastPPR {
   }
 
 
-  /** Returns the set of nodes with some out-neighbor in the target set (those nodes v with
+  /** Returns the set of nodes outside the target set with some out-neighbor in the target set (where the target set is those nodes v with
     * ppr(v, target) > reversePPRSignificanceThreshold)
     */
 
@@ -233,7 +233,9 @@ object FastPPR {
       if (vInTargetSet) {
         val v = graph.getNodeById(vId).get
         for (uId <- v.inboundNodes()) {
-          frontier.add(uId)
+          if (inversePPREstimates(uId) < reversePPRSignificanceThreshold) {
+            frontier.add(uId)
+          }
         }
       }
     }

@@ -28,10 +28,16 @@ object Main {
         CSVExportExperiment.createCSVFiles(graph, csvFilePathPrefix, nodeCount)
       }
       case "ff_size" => {
-        assert(args.size == 4)
-        val maxResidual = args(2).toFloat
-        val nodeCount = args(3).toInt
-        ForwardFrontierExperiment.forwardFrontierSizes(graph, maxResidual, nodeCount)
+        assert(args.size == 3)
+        //val maxResidual = args(2).toFloat
+        val nodeCount = args(2).toInt
+        //ForwardFrontierExperiment.forwardFrontierSizes(graph, maxResidual, nodeCount)
+        ForwardFrontierExperiment.forwardFrontierSizesVaryingResidual(graph, nodeCount)
+      }
+      case "frontier_size" => {
+        assert(args.size == 3)
+        val nodeCount = args(2).toInt
+        StorageExperiments.frontierSizesVaryingResidual(graph, nodeCount)
       }
 
       case otherString => println("Unrecognized experiment " + otherString)
