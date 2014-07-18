@@ -1,8 +1,8 @@
 package soal.fastppr.restapi
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorRef, Props, ActorSystem}
 import spray.servlet.WebBoot
-import akka.io.IO
+import akka.io.{Inet, IO}
 import spray.can.Http
 import com.typesafe.config.{Config, ConfigFactory}
 import com.twitter.cassovary.util.io.AdjacencyListGraphReader
@@ -10,6 +10,9 @@ import com.twitter.cassovary.graph.StoredGraphDir._
 import com.twitter.cassovary.graph.StoredGraphDir
 import com.twitter.cassovary.graph.StoredGraphDir.StoredGraphDir
 import soal.fastppr.FastPPRConfiguration
+import java.net.InetSocketAddress
+import scala.collection.immutable
+import spray.can.server.ServerSettings
 
 
 class FastPPRServiceBoot extends WebBoot {
@@ -21,7 +24,7 @@ class FastPPRServiceBoot extends WebBoot {
   val graph = reader.toArrayBasedDirectedGraph()
 
   // TODO: Read from config file
-  val fastPPRConfig = FastPPRConfiguration.defaultConfiguration
+  val fastPPRConfig = FastPPRConfiguration.defaultConfiguration.copy(pprSignificanceThreshold = 4.0f / graph.nodeCount)
 
   // we need an ActorSystem to host our application in
   val system = ActorSystem("FastPPRService")
@@ -41,5 +44,6 @@ object FastPPRServiceBoot extends App {
   val conf = ConfigFactory.load()
   val port = conf.getInt("fastppr.restapi.port")
 
-  IO(Http)(system) ! Http.Bind(service, interface = "localhost", port = port)
+  //IO(Http)(system) ! Http.Bind(service, interface = "localhost", port = port)
+  IO(Http)(system) ! Http.Bind(service, new InetSocketAddress(port),100, Nil, None)
 }
